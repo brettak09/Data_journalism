@@ -52,11 +52,15 @@ function renderAxes(newXScale, xAxis) {
 
 // function used for updating circles group with a transition to
 // new circles
-function renderCircles(circlesGroup, newXScale, chosenXaxis) {
+function renderCircles(circlesGroup, newXScale, oldYScale, chosenXaxis) {
 
   circlesGroup.transition()
     .duration(1000)
-    .attr("cx", d => newXScale(d[chosenXAxis]));
+    .attr('transform', d => {
+      return `translate(${newXScale(d[chosenXaxis])},
+                        ${oldYScale(d.smokes)})`
+    });
+    // .attr("cx", d => newXScale(d[chosenXAxis]));
 
   return circlesGroup;
 }
@@ -133,28 +137,54 @@ var xAxis = chartGroup.append("g")
 chartGroup.append("g")
   .call(leftAxis);
 
-// append initial circles
-var circlesGroup = chartGroup.selectAll("circle")
-  .data(censusData)
-  .enter()
-  .append("circle")
-  .attr("cx", d => xLinearScale(d[chosenXAxis]))
-  .attr("cy", d => yLinearScale(d.smokes))
+// append initial 
+var circlesGroup = chartGroup.selectAll('g .circles')
+                    .data(censusData)
+                    .enter()
+                    .append('g')
+                    .attr('class', 'circles')
+                    .attr('id', d => d.state)
+                    .attr('transform', d => {
+                      return `translate(${xLinearScale(d[chosenXAxis])},
+                                       ${yLinearScale(d.smokes)})`
+                    });
+               
+
+  circlesGroup.append('circle')
+  // .attr("cx", d => xLinearScale(d[chosenXAxis]))
+  // .attr("cy", d => yLinearScale(d.smokes))
   .attr("r", 20)
   .attr("fill", "blue")
   .attr("opacity", ".75");
 
-  // append text remove comment below on final sub.
-let textGroup = chartGroup.selectAll("circle text")
-  .data(censusData)
-  .enter()
-  .append("text")
+  circlesGroup.append('text')
+  .attr("dy", d => 4)
+  .attr("dx", d => -10)
   .text(function(data){
     return data.abbr
-  })
-  .attr("dx", d => xLinearScale(d[chosenXAxis]))
-  .attr("dy", d => yLinearScale(d.age))
-  .attr("font-size" , 12)
+  });
+
+// var circlesGroup = chartGroup.selectAll("circle")
+//   .data(censusData)
+//   .enter()
+//   .append("circle")
+//   .attr("cx", d => xLinearScale(d[chosenXAxis]))
+//   .attr("cy", d => yLinearScale(d.smokes))
+//   .attr("r", 20)
+//   .attr("fill", "blue")
+//   .attr("opacity", ".75");
+
+//   // append text remove comment below on final sub.
+// let textGroup = chartGroup.selectAll("circle text")
+//   .data(censusData)
+//   .enter()
+//   .append("text")
+//   .text(function(data){
+//     return data.abbr
+//   })
+//   .attr("dx", d => xLinearScale(d[chosenXAxis]))
+//   .attr("dy", d => yLinearScale(d.smokes))
+//   .attr("font-size" , 12)
   
 
 // Create group for  2 x- axis labels
@@ -207,7 +237,7 @@ labelsGroup.selectAll("text")
       xAxis = renderAxes(xLinearScale, xAxis);
 
       // updates circles with new x values
-      circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
+      circlesGroup = renderCircles(circlesGroup, xLinearScale, yLinearScale, chosenXAxis);
 
       // updates tooltips with new info
       circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
