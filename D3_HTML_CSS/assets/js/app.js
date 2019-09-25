@@ -145,16 +145,16 @@ var circlesGroup = chartGroup.selectAll("circle")
   .attr("opacity", ".75");
 
   // append text remove comment below on final sub.
-// let textGroup = chartGroup.selectAll("circle text")
-//   .data(censusData)
-//   .enter()
-//   .append("text")
-//   .text(function(data){
-//     return data.abbr
-//   })
-//   .attr("dx", d => xLinearScale(d[chosenXAxis]))
-//   .attr("dy", d => yLinearScale(d.age))
-//   .attr("font-size" , 12)
+let textGroup = chartGroup.selectAll("circle text")
+  .data(censusData)
+  .enter()
+  .append("text")
+  .text(function(data){
+    return data.abbr
+  })
+  .attr("dx", d => xLinearScale(d[chosenXAxis]))
+  .attr("dy", d => yLinearScale(d.age))
+  .attr("font-size" , 12)
   
 
 // Create group for  2 x- axis labels
